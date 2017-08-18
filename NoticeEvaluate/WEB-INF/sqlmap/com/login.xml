@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="login">
+
+	<!-- 사용자 패스워드 검증 -->
+    <select id="checkUser" resultType="java.util.HashMap">
+        SELECT 	USER_ID, CREATED_DATE, UPDATED_DATE
+		FROM	nes.CO_TB_USER_INFO
+		WHERE 	1=1
+			AND USER_ID = #{userId}
+			AND USER_PW = #{password}
+    </select>
+	
+	<!-- 사용자 로그인 기록 -->    
+    <insert id="insertConnectHistory">
+	  	INSERT INTO nes.CO_TB_USER_CNTC_HSTR (USER_ID, CREATED_DATE)
+      	VALUES	(#{userId}, sysdate())
+	</insert>
+	
+	<!-- 최종 IDX -->
+    <select id="getLastIdx" resultType="java.util.HashMap">
+    	SELECT MIN(A.IDX) LAST_IDX
+		FROM nes.notam_set_dev A
+		WHERE A.IDX NOT IN (SELECT C.IDX FROM nes.CO_TB_NOTAM_RESULT C, nes.CO_TB_USER_INFO D
+	            WHERE	C.USER_ID = D.USER_ID
+					AND C.USER_ID = #{userId})
+    </select>
+    
+</mapper>

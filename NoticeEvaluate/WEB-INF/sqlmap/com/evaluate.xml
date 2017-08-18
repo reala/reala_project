@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="evaluate">
+
+	<!-- NOTAM_조회 -->
+    <select id="retieveNOTAM" resultType="java.util.HashMap">
+		SELECT	a.idx, a.NOTAM_NUM, a.NOTAM_TEXT, a.TRIM_NOTAM, a.html, c.SCORE
+		FROM nes.notam_set_dev a left join  (
+			SELECT c.idx, c.SCORE 
+			FROM nes.CO_TB_NOTAM_RESULT c, nes.CO_TB_USER_INFO d
+            WHERE	c.USER_ID = d.USER_ID
+				AND c.USER_ID = #{userId}            
+            ) c
+		ON	a.idx = c.idx
+		WHERE	1=1
+			AND a.idx = #{idx}
+    </select>
+
+	<!-- NOTAM_저장이력_조회 -->
+    <select id="retieveNotamResult" resultType="java.util.HashMap">
+		SELECT	*
+		FROM	nes.CO_TB_NOTAM_RESULT
+		WHERE	1=1
+			AND	USER_ID = #{userId}
+		    AND idx = #{idx}
+    </select>
+    
+    <!-- NOTAM Score Update -->
+    <update id="updateEvalute">
+    	UPDATE nes.CO_TB_NOTAM_RESULT
+    	SET	   SCORE = #{score}
+    	WHERE  idx = #{idx}
+    	  AND  USER_ID = #{userId} 
+    </update>
+    
+    <!-- NOTAM Score 저장 -->    
+    <insert id="insertEvalute">
+	  INSERT INTO nes.CO_TB_NOTAM_RESULT (
+			idx,
+		    USER_ID,
+		    SCORE,
+		    CREATED_DATE
+	  )
+	  VALUES (
+			#{idx}, 
+		    #{userId}, 
+		    #{score},
+		    sysdate()
+	  )
+	</insert>
+
+</mapper>
