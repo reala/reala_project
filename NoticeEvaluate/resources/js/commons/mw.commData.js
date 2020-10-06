@@ -959,5 +959,6 @@ var commonData = (function() {
 	};
 	
 	return _public;
+	
 })();
 
